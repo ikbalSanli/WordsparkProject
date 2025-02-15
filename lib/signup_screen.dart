@@ -10,60 +10,150 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  bool isLoading = false;
 
-  // Kayıt olma işlemi
   Future<void> registerUser() async {
+    setState(() {
+      isLoading = true;
+    });
+
     try {
       await _auth.createUserWithEmailAndPassword(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Kayıt başarılı!")),
+        SnackBar(
+          content: Text("Kayıt başarılı!"),
+          backgroundColor: Colors.green,
+        ),
       );
-      // Kullanıcı kaydolduktan sonra giriş ekranına yönlendir
       Navigator.pushReplacementNamed(context, "/");
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Kayıt hatası: $e")),
+        SnackBar(
+          content: Text("Kayıt hatası: ${e.toString().split(']').last}"),
+          backgroundColor: Colors.red,
+        ),
       );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Kayıt Ol")),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // E-posta alanı
-            TextField(
-              controller: emailController,
-              decoration: InputDecoration(labelText: "E-posta"),
-              keyboardType: TextInputType.emailAddress,
+      backgroundColor: Colors.grey[100],
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                SizedBox(height: 60),
+                // Logo veya uygulama adı
+                Icon(
+                  Icons.person_add_outlined,
+                  size: 80,
+                  color: Colors.deepPurple,
+                ),
+                SizedBox(height: 20),
+                Text(
+                  'Hesap Oluştur',
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.deepPurple,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: 40),
+                // Email alanı
+                Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: TextField(
+                      controller: emailController,
+                      decoration: InputDecoration(
+                        labelText: "E-posta",
+                        labelStyle: TextStyle(color: Colors.deepPurple),
+                        prefixIcon: Icon(Icons.email, color: Colors.deepPurple),
+                        border: InputBorder.none,
+                      ),
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                // Şifre alanı
+                Card(
+                  elevation: 4,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: TextField(
+                      controller: passwordController,
+                      decoration: InputDecoration(
+                        labelText: "Şifre",
+                        labelStyle: TextStyle(color: Colors.deepPurple),
+                        prefixIcon: Icon(Icons.lock, color: Colors.deepPurple),
+                        border: InputBorder.none,
+                      ),
+                      obscureText: true,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 24),
+                // Kayıt ol butonu
+                ElevatedButton(
+                  onPressed: isLoading ? null : registerUser,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    foregroundColor: Colors.white, // Buton text rengi
+                  ),
+                  child: isLoading
+                      ? CircularProgressIndicator(color: Colors.white)
+                      : Text(
+                    "Kayıt Ol",
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white, // Text rengi
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                // Giriş yap butonu
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacementNamed(context, "/");
+                  },
+                  child: Text(
+                    "Zaten bir hesabınız var mı? Giriş Yap",
+                    style: TextStyle(
+                      color: Colors.deepPurple,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
             ),
-            // Şifre alanı
-            TextField(
-              controller: passwordController,
-              decoration: InputDecoration(labelText: "Şifre"),
-              obscureText: true,
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: registerUser,
-              child: Text("Kayıt Ol"),
-            ),
-            // Giriş ekranına yönlendiren buton
-            TextButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, "/");
-              },
-              child: Text("Zaten bir hesabınız var mı? Giriş Yap"),
-            ),
-          ],
+          ),
         ),
       ),
     );
