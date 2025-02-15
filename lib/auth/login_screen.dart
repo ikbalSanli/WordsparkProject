@@ -141,7 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Kayıt ol butonu
                 TextButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, "/register");
+                    Navigator.pushNamed(context, "/register");  // Kayıt ekranına yönlendirir
                   },
                   child: Text(
                     "Hesabınız yok mu? Kayıt Ol",

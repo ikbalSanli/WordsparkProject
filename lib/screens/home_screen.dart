@@ -86,6 +86,12 @@ class HomeScreen extends StatelessWidget {
           style: TextStyle(fontWeight: FontWeight.w600, letterSpacing: 0.5),
         ),
       ),
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back),
+        onPressed: () {
+          Navigator.pushNamed(context, '/login');
+        },
+      ),
       actions: [
         IconButton(
           icon: Icon(Icons.favorite_border),
@@ -98,6 +104,7 @@ class HomeScreen extends StatelessWidget {
       ],
     );
   }
+
 
   Widget _buildStatsSection() {
     return Consumer<HomeScreenModel>(
