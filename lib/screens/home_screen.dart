@@ -1,69 +1,325 @@
-import 'package:firebase_auth/firebase_auth.dart';
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:wordspark/components/home/feature_card.dart';
+import 'package:wordspark/components/home/stats_card.dart';
+import 'package:wordspark/service/auth_service.dart';
 
-class HomeScreenModel extends ChangeNotifier {
-  int learnedWords = 0;
-  int dailyGoal = 100;
-  int dailyProgress = 0;
-  int favoriteCount = 0;
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key});
 
-  void updateStats({
-    int? words,
-    int? progress,
-    int? favorites,
-  }) {
-    if (words != null) learnedWords = words;
-    if (progress != null) dailyProgress = progress;
-    if (favorites != null) favoriteCount = favorites;
-    notifyListeners();
-  }
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class HomeScreen extends StatelessWidget {
-  final List<FeatureCardData> features = [
-    FeatureCardData(
-      title: "Kelime Kartları",
-      icon: Icons.credit_card,
-      route: '/flashcards',
-      gradient: [Color(0xFF3F51B5), Color(0xFF5C6BC0)],
-    ),
-    FeatureCardData(
-      title: "Okuma Parçaları",
-      icon: Icons.menu_book,
-      route: '/reading',
-      gradient: [Color(0xFF00897B), Color(0xFF26A69A)],
-    ),
-    FeatureCardData(
-      title: "Gramer",
-      icon: Icons.school,
-      route: '/grammar',
-      gradient: [Color(0xFF5E35B1), Color(0xFF7E57C2)],
-    ),
-    FeatureCardData(
-      title: "Kelime Testi",
-      icon: Icons.quiz,
-      route: '/quiz',
-      gradient: [Color(0xFF6A1B9A), Color(0xFF8E24AA)],
-    ),
-  ];
+class _HomeScreenState extends State<HomeScreen> { 
+
+  String userName = "Loading..."; // Varsayılan değer
+  final AuthService _authService = AuthService();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    try {
+      final userData = await _authService.getUserData();
+      if (userData != null) {
+        setState(() {
+          userName = "${userData['firstName']} ${userData['lastName']}";
+        });
+      } else {
+        setState(() {
+          userName = "Bilinmeyen Kullanıcı";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        userName = "Hata oluştu";
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => HomeScreenModel(),
-      child: Scaffold(
-        backgroundColor: Colors.grey[50],
-        body: CustomScrollView(
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FC),
+      body: SafeArea(
+        child: CustomScrollView(
           slivers: [
-            _buildAppBar(context),
             SliverToBoxAdapter(
-              child: Column(
-                children: [
-                  _buildStatsSection(),
-                  _buildMainContent(context),
-                  _buildChatbotCard(context),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Merhaba 👋',
+                          style: TextStyle(
+                            color: Colors.grey.shade600,
+                            fontSize: 16,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                         Text(
+                          userName.toUpperCase(),
+                          style: const TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.pushNamed(context, '/profile'),
+                      child: Container(
+                        height: 50,
+                        width: 50,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.shade200,
+                              blurRadius: 10,
+                              offset: const Offset(0, 5),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.person_outline,
+                          color: Color(0xFF4A148C),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Progress Section
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFF4A148C), Color(0xFF7E57C2)],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    ),
+                    borderRadius: BorderRadius.circular(25),
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color(0xFF4A148C).withOpacity(0.3),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Günlük İlerleme',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          Icon(Icons.trending_up, color: Colors.white),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        height: 6,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(3),
+                        ),
+                        child: LayoutBuilder(
+                          builder: (context, constraints) {
+                            return Row(
+                              children: [
+                                Container(
+                                  width: constraints.maxWidth * 0.7,
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(3),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      const Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '70/100 kelime',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                            ),
+                          ),
+                          Text(
+                            '%70',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: buildStatCard(
+                        title: 'Öğrenilen',
+                        value: '1,234',
+                        icon: Icons.auto_stories,
+                        color: const Color(0xFF4CAF50),
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: buildStatCard(
+                        title: 'Favoriler',
+                        value: '56',
+                        icon: Icons.favorite,
+                        color: const Color(0xFFE91E63),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Features Grid
+            SliverPadding(
+              padding: const EdgeInsets.all(20),
+              sliver: SliverGrid(
+                delegate: SliverChildListDelegate([
+                  buildFeatureCard(
+                    title: 'Kelime Kartları',
+                    icon: Icons.style,
+                    gradient: const [Color(0xFF1E88E5), Color(0xFF42A5F5)],
+                    onTap: () => Navigator.pushNamed(context, '/flashcards'),
+                  ),
+                  buildFeatureCard(
+                    title: 'Okuma',
+                    icon: Icons.menu_book,
+                    gradient: const [Color(0xFF43A047), Color(0xFF66BB6A)],
+                    onTap: () => Navigator.pushNamed(context, '/reading'),
+                  ),
+                  buildFeatureCard(
+                    title: 'Quiz',
+                    icon: Icons.quiz,
+                    gradient: const [Color(0xFFE53935), Color(0xFFEF5350)],
+                    onTap: () => Navigator.pushNamed(context, '/quiz'),
+                  ),
+                  buildFeatureCard(
+                    title: 'Gramer',
+                    icon: Icons.school,
+                    gradient: const [Color(0xFF8E24AA), Color(0xFFAB47BC)],
+                    onTap: () => Navigator.pushNamed(context, '/grammar'),
+                  ),
+                ]),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 15,
+                  crossAxisSpacing: 15,
+                  childAspectRatio: 1.1,
+                ),
+              ),
+            ),
+
+            // AI Assistant Card
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(20),
+                child: GestureDetector(
+                  onTap: () => Navigator.pushNamed(context, '/chatbot'),
+                  child: Container(
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(25),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.shade200,
+                          blurRadius: 10,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF4A148C).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          child: const Icon(
+                            Icons.psychology,
+                            color: Color(0xFF4A148C),
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(width: 15),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'AI Asistan',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 4),
+                              Text(
+                                'Sorularını yanıtlamak için hazır',
+                                style: TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const Icon(
+                          Icons.arrow_forward_ios,
+                          color: Colors.grey,
+                          size: 16,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
           ],
@@ -71,134 +327,5 @@ class HomeScreen extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildAppBar(BuildContext context) {
-    return SliverAppBar(
-      expandedHeight: 120.0,
-      floating: false,
-      pinned: true,
-      backgroundColor: Color(0xFF4A148C),
-      flexibleSpace: FlexibleSpaceBar(
-        title: Text(
-          'WORD SPARK',
-          style: TextStyle(fontWeight: FontWeight.w600, letterSpacing: 0.5),
-        ),
-      ),
-      leading: IconButton(
-        icon: Icon(Icons.arrow_back),
-        onPressed: () {
-          Navigator.pushNamed(context, '/login');
-        },
-      ),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.favorite_border),
-          onPressed: () => Navigator.pushNamed(context, '/favorites'),
-        ),
-        IconButton(
-          icon: Icon(Icons.person_outline),
-          onPressed: () => Navigator.pushNamed(context, '/profile'),
-        ),
-      ],
-    );
-  }
-
-
-  Widget _buildStatsSection() {
-    return Consumer<HomeScreenModel>(
-      builder: (context, model, child) => Padding(
-        padding: EdgeInsets.all(16),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            _buildStatCard("Öğrenilen Kelimeler", "${model.learnedWords}", Icons.auto_stories),
-            _buildStatCard("Günlük Hedef", "${model.dailyProgress}/${model.dailyGoal}", Icons.trending_up),
-            _buildStatCard("Favoriler", "${model.favoriteCount}", Icons.favorite),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildStatCard(String title, String value, IconData icon) {
-    return Card(
-      elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: Padding(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, color: Color(0xFF4A148C), size: 24),
-            SizedBox(height: 8),
-            Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            SizedBox(height: 4),
-            Text(title, textAlign: TextAlign.center, style: TextStyle(fontSize: 12)),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMainContent(BuildContext context) {
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 2, crossAxisSpacing: 16, mainAxisSpacing: 16),
-      itemCount: features.length,
-      itemBuilder: (context, index) => _buildFeatureCard(context, features[index]),
-    );
-  }
-
-  Widget _buildFeatureCard(BuildContext context, FeatureCardData data) {
-    return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, data.route),
-      child: Card(
-        elevation: 4,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(colors: data.gradient),
-            borderRadius: BorderRadius.circular(15),
-          ),
-          padding: EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(data.icon, size: 40, color: Colors.white),
-              SizedBox(height: 12),
-              Text(data.title, style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildChatbotCard(BuildContext context) {
-    return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, '/chatbot'),
-      child: Card(
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Icon(Icons.chat, color: Color(0xFF4A148C)),
-              SizedBox(width: 10),
-              Text("Soru Asistanı", style: TextStyle(fontSize: 18)),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }
 
-class FeatureCardData {
-  final String title;
-  final IconData icon;
-  final String route;
-  final List<Color> gradient;
-
-  FeatureCardData({required this.title, required this.icon, required this.route, required this.gradient});
-}

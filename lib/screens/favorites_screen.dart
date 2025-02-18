@@ -4,21 +4,21 @@ class FavoritesScreen extends StatelessWidget {
   final List<Map<String, String>> favoriteWords;
 
   // Varsayılan olarak boş liste kullan
-  FavoritesScreen({this.favoriteWords = const []});
+  const FavoritesScreen({super.key, this.favoriteWords = const []});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Favoriler")),
+      appBar: AppBar(title: const Text("Favoriler")),
       body: favoriteWords.isEmpty
-          ? Center(child: Text("Henüz favorilere eklenmiş kelime yok!"))
+          ? const Center(child: Text("Henüz favorilere eklenmiş kelime yok!"))
           : ListView.builder(
         itemCount: favoriteWords.length,
         itemBuilder: (context, index) {
           return ListTile(
             title: Text(favoriteWords[index]["english"]!),
             subtitle: Text(favoriteWords[index]["turkish"]!),
-            leading: Icon(Icons.star, color: Colors.amber),
+            leading: const Icon(Icons.star, color: Colors.amber),
           );
         },
       ),

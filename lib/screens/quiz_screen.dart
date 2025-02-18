@@ -13,8 +13,10 @@ class Question {
 }
 
 class QuizScreen extends StatefulWidget {
+  const QuizScreen({super.key});
+
   @override
-  _QuizScreenState createState() => _QuizScreenState();
+  State<QuizScreen> createState() => _QuizScreenState();
 }
 
 class _QuizScreenState extends State<QuizScreen> {
@@ -104,23 +106,23 @@ class _QuizScreenState extends State<QuizScreen> {
     if (isQuizFinished) {
       return Scaffold(
         appBar: AppBar(
-          title: Text('Quiz Results'),
+          title: const Text('Quiz Results'),
           backgroundColor: Colors.deepPurple,
         ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text(
+              const Text(
                 'Quiz Completed!',
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                style:  TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               Text(
                 'Your Score: $correctAnswers/${questions.length}',
-                style: TextStyle(fontSize: 20),
+                style: const TextStyle(fontSize: 20),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               ElevatedButton(
                 onPressed: () {
                   setState(() {
@@ -133,9 +135,9 @@ class _QuizScreenState extends State<QuizScreen> {
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
-                  padding: EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                 ),
-                child: Text(
+                child: const Text(
                   'Restart Quiz',
                   style: TextStyle(fontSize: 18),
                 ),
@@ -148,7 +150,7 @@ class _QuizScreenState extends State<QuizScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Quiz'),
+        title: const Text('Quiz'),
         backgroundColor: Colors.deepPurple,
       ),
       body: Padding(
@@ -159,9 +161,9 @@ class _QuizScreenState extends State<QuizScreen> {
             LinearProgressIndicator(
               value: (currentQuestionIndex + 1) / questions.length,
               backgroundColor: Colors.grey[200],
-              valueColor: AlwaysStoppedAnimation<Color>(Colors.deepPurple),
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.deepPurple),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             Text(
               'Question ${currentQuestionIndex + 1}/${questions.length}',
@@ -171,7 +173,7 @@ class _QuizScreenState extends State<QuizScreen> {
                 color: Colors.grey[600],
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             Card(
               elevation: 4,
@@ -179,14 +181,14 @@ class _QuizScreenState extends State<QuizScreen> {
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
                   questions[currentQuestionIndex].questionText,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             ...List.generate(
               questions[currentQuestionIndex].options.length,
@@ -196,7 +198,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   onPressed: hasAnswered ? null : () => checkAnswer(index),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: getOptionColor(index),
-                    padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -213,12 +215,12 @@ class _QuizScreenState extends State<QuizScreen> {
             ),
 
             if (hasAnswered) ...[
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: nextQuestion,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
-                  padding: EdgeInsets.symmetric(vertical: 16),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -227,7 +229,7 @@ class _QuizScreenState extends State<QuizScreen> {
                   currentQuestionIndex < questions.length - 1
                       ? 'Next Question'
                       : 'Finish Quiz',
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
