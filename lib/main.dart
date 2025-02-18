@@ -1,9 +1,9 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'auth/login_screen.dart';
-import 'firebase_options.dart'; // firebase_options.dart dosyasını import et
+import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'screens/home_screen.dart'; // HomeScreen widget'ını import et
+import 'screens/home_screen.dart';
 import 'auth/signup_screen.dart';
 import 'screens/flashcards_screen.dart';
 import 'screens/reading_screen.dart';
@@ -16,16 +16,14 @@ import 'screens/profile_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // Firebase'i başlatırken doğru yapılandırma dosyasını kullan
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform, // Firebase yapılandırmasını sağla
+    options: DefaultFirebaseOptions.currentPlatform,
   );
-  // Kullanıcı durumunu dinle
   FirebaseAuth.instance.authStateChanges().listen((User? user) {
     if (user == null) {
-      runApp(MyApp(isAuthenticated: false)); // Giriş yapmamışsa login ekranı
+      runApp(MyApp(isAuthenticated: false));
     } else {
-      runApp(MyApp(isAuthenticated: true)); // Giriş yapmışsa home ekranı
+      runApp(MyApp(isAuthenticated: true));
     }
   });
 }
@@ -39,12 +37,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'WordSpark',
-      initialRoute: isAuthenticated ? '/home' : '/', // Kullanıcı durumuna göre yönlendirme
+      initialRoute: isAuthenticated ? '/home' : '/login',
       routes: {
-        '/': (context) => LoginScreen(),  // Giriş ekranı ana sayfa olarak
         '/login': (context) => LoginScreen(),
-        '/register': (context) => RegisterScreen(), // Kayıt ekranı
-        '/home': (context) => HomeScreen(), // Add your home screen here
+        '/register': (context) => RegisterScreen(),
+        '/home': (context) => HomeScreen(),
         '/flashcards': (context) => FlashcardsScreen(),
         '/reading': (context) => ReadingScreen(),
         '/grammar': (context) => GrammarScreen(),

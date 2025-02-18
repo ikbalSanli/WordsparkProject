@@ -16,16 +16,20 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
 
   final List<Map<String, String>> favoriteWords = [];
 
-  void addToFavorites(Map<String, String> word) {
-    if (!favoriteWords.contains(word)) {
-      setState(() {
+  void toggleFavorite(Map<String, String> word) {
+    setState(() {
+      if (favoriteWords.contains(word)) {
+        favoriteWords.remove(word);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("${word["english"]} favorilerden çıkarıldı!")),
+        );
+      } else {
         favoriteWords.add(word);
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("${word["english"]} favorilere eklendi!")),
-      );
-    }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("${word["english"]} favorilere eklendi!")),
+        );
+      }
+    });
   }
 
   @override
@@ -37,11 +41,13 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.favorite),
+            color: Colors.white,
             onPressed: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => FavoritesScreen(favoriteWords: favoriteWords),
+
                 ),
               );
             },
@@ -52,20 +58,33 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
         child: PageView.builder(
           itemCount: words.length,
           itemBuilder: (context, index) {
-            return Stack(
+            final word = words[index];
+            final isFavorite = favoriteWords.contains(word);
+
+            return Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                FlipCard(
-                  direction: FlipDirection.HORIZONTAL,
-                  front: _buildCard(words[index]["english"]!, Icons.translate),
-                  back: _buildCard(words[index]["turkish"]!, Icons.language),
-                ),
-                Positioned(
-                  top: 10,
-                  right: 10,
-                  child: IconButton(
-                    icon: Icon(Icons.star_border, color: Colors.white, size: 30),
-                    onPressed: () => addToFavorites(words[index]),
-                  ),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    FlipCard(
+                      direction: FlipDirection.HORIZONTAL,
+                      front: _buildCard(word["english"]!),
+                      back: _buildCard(word["turkish"]!),
+                    ),
+                    Positioned(
+                      top: 20,
+                      right: 20,
+                      child: IconButton(
+                        icon: Icon(
+                          isFavorite ? Icons.favorite : Icons.favorite_border,
+                          color: isFavorite ? Colors.red : Colors.white,
+                          size: 35,
+                        ),
+                        onPressed: () => toggleFavorite(word),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             );
@@ -75,14 +94,14 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
     );
   }
 
-  Widget _buildCard(String text, IconData icon) {
+  Widget _buildCard(String text) {
     return Card(
       elevation: 4,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Container(
-        width: 300,
-        height: 200,
-        padding: EdgeInsets.all(16),
+        width: 350,
+        height: 300,
+        padding: EdgeInsets.all(20),
         alignment: Alignment.center,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
@@ -90,16 +109,10 @@ class _FlashcardsScreenState extends State<FlashcardsScreen> {
             colors: [Colors.deepPurple, Colors.purpleAccent],
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 30, color: Colors.white),
-            SizedBox(height: 10),
-            Text(
-              text,
-              style: TextStyle(fontSize: 20, color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-          ],
+        child: Text(
+          text,
+          style: TextStyle(fontSize: 24, color: Colors.white, fontWeight: FontWeight.bold),
+          textAlign: TextAlign.center,
         ),
       ),
     );

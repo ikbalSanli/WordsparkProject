@@ -57,7 +57,6 @@ class _LoginScreenState extends State<LoginScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(height: 60),
-                // Logo veya uygulama adı
                 Icon(
                   Icons.lock_outline,
                   size: 80,
@@ -133,7 +132,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white, // Text rengi
+                      color: Colors.white,
                     ),
                   ),
                 ),
@@ -141,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 // Kayıt ol butonu
                 TextButton(
                   onPressed: () {
-                    Navigator.pushNamed(context, "/register");  // Kayıt ekranına yönlendirir
+                    Navigator.pushNamed(context, "/register");
                   },
                   child: Text(
                     "Hesabınız yok mu? Kayıt Ol",

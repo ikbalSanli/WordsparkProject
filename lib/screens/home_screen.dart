@@ -2,7 +2,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-// Ana ekranın state yönetimi için model
 class HomeScreenModel extends ChangeNotifier {
   int learnedWords = 0;
   int dailyGoal = 100;
@@ -22,7 +21,6 @@ class HomeScreenModel extends ChangeNotifier {
 }
 
 class HomeScreen extends StatelessWidget {
-  // Özellik kartları için veri modeli
   final List<FeatureCardData> features = [
     FeatureCardData(
       title: "Kelime Kartları",

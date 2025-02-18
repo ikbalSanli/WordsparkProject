@@ -56,7 +56,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 SizedBox(height: 60),
-                // Logo veya uygulama adı
                 Icon(
                   Icons.person_add_outlined,
                   size: 80,
@@ -141,7 +140,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 // Giriş yap butonu
                 TextButton(
                   onPressed: () {
-                    Navigator.pushReplacementNamed(context, "/");
+                    Navigator.pushReplacementNamed(context, "/login");
                   },
                   child: Text(
                     "Zaten bir hesabınız var mı? Giriş Yap",
