@@ -1,76 +1,7 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:flip_card/flip_card.dart';
 import 'package:wordspark/components/flashcard/flashcard_widget.dart';
 import 'package:wordspark/model/flashcard_model.dart';
-
-
-
-// örnek veri böyle gelicek
-final List<Flashcard> sampleFlashcards = [
-  Flashcard(
-    english: "Apple",
-    turkish: "Elma",
-    example: "I eat an apple every day.",
-    category: "Food",
-  ),
-  Flashcard(
-    english: "House",
-    turkish: "Ev",
-    example: "This is my house.",
-    category: "Buildings",
-  ),
-  Flashcard(
-    english: "Book",
-    turkish: "Kitap",
-    example: "I love reading books.",
-    category: "Education",
-  ),
-  Flashcard(
-    english: "Car",
-    turkish: "Araba",
-    example: "My car is red.",
-    category: "Transportation",
-  ),
-  Flashcard(
-    english: "Sun",
-    turkish: "Güneş",
-    example: "The sun is shining brightly.",
-    category: "Nature",
-  ),
-  Flashcard(
-    english: "Water",
-    turkish: "Su",
-    example: "I drink water every day.",
-    category: "Basics",
-  ),
-  Flashcard(
-    english: "Phone",
-    turkish: "Telefon",
-    example: "Can I use your phone?",
-    category: "Technology",
-  ),
-  Flashcard(
-    english: "Friend",
-    turkish: "Arkadaş",
-    example: "She is my best friend.",
-    category: "Relationships",
-  ),
-  Flashcard(
-    english: "Time",
-    turkish: "Zaman",
-    example: "What time is it?",
-    category: "Basics",
-  ),
-  Flashcard(
-    english: "Music",
-    turkish: "Müzik",
-    example: "I love listening to music.",
-    category: "Entertainment",
-  ),
-];
-
 
 class FlashcardsScreen extends StatefulWidget {
   const FlashcardsScreen({super.key});
@@ -81,236 +12,215 @@ class FlashcardsScreen extends StatefulWidget {
 
 class _FlashcardsScreenState extends State<FlashcardsScreen> {
   late PageController _pageController;
-  late List<Flashcard> flashcards;
+  String? selectedUnit;
   final Map<int, GlobalKey<FlipCardState>> _cardKeys = {};
+
+  final Map<String, List<Flashcard>> units = {
+    "Ünite 1 - Food": [
+      Flashcard(english: "Apple", turkish: "Elma", example: "I eat an apple every day."),
+      Flashcard(english: "Water", turkish: "Su", example: "I drink water every day."),
+    ],
+    "Ünite 2 - Buildings": [
+      Flashcard(english: "House", turkish: "Ev", example: "This is my house."),
+    ],
+    "Ünite 3 - Education": [
+      Flashcard(english: "Book", turkish: "Kitap", example: "I love reading books."),
+    ],
+  };
+
+  List<Flashcard> filteredFlashcards = [];
 
   @override
   void initState() {
     super.initState();
-    flashcards = sampleFlashcards;
     _pageController = PageController();
+    filteredFlashcards = units["Ünite 1 - Food"]!;
+  }
+
+  void _filterFlashcards(String filter) {
+    setState(() {
+      if (filter == 'Öğrendiklerim') {
+        filteredFlashcards = units[selectedUnit]!.where((flashcard) => flashcard.isLearned).toList();
+      } else if (filter == 'Favorilerim') {
+        filteredFlashcards = units[selectedUnit]!.where((flashcard) => flashcard.isFavorite).toList();
+      } else {
+        filteredFlashcards = units[selectedUnit]!;
+      }
+      Navigator.pop(context);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
       appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        title: const Text(
-          "Kelime Kartları",
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.bold,
+        title: Text(selectedUnit == null ? "Üniteler" : selectedUnit!),
+        backgroundColor: Colors.deepPurple,
+        leading: selectedUnit != null
+            ? IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => setState(() => selectedUnit = null),
+        )
+            : null,
+        actions: selectedUnit == null
+            ? null
+            : [
+          Builder(
+            builder: (context) => IconButton(
+              icon: const Icon(Icons.menu),
+              onPressed: () => Scaffold.of(context).openEndDrawer(),
+            ),
           ),
+        ],
+      ),
+
+
+      endDrawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(
+              decoration: const BoxDecoration(color: Colors.deepPurple),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: const [
+                  Text("Kelime Kartları", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
+                  SizedBox(height: 8),
+                  Text("Filtreleme Seçenekleri", style: TextStyle(color: Colors.white70, fontSize: 16)),
+                ],
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.list, color: Colors.deepPurple),
+              title: const Text("Tüm Kelimeler"),
+              onTap: () => _filterFlashcards("Tüm Kelimeler"),
+            ),
+            ListTile(
+              leading: const Icon(Icons.check_circle, color: Colors.deepPurple),
+              title: const Text("Öğrendiklerim"),
+              onTap: () => _filterFlashcards("Öğrendiklerim"),
+            ),
+            ListTile(
+              leading: const Icon(Icons.favorite, color: Colors.deepPurple),
+              title: const Text("Favorilerim"),
+              onTap: () => _filterFlashcards("Favorilerim"),
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.filter_list, color: Colors.black87),
-            onPressed: _showFilterDialog,
-          ),
-          IconButton(
-            icon: const Icon(Icons.favorite, color: Colors.red),
-            onPressed: () => Navigator.pushNamed(context, '/favorites'),
-          ),
-        ],
       ),
-      body: Column(
-        children: [
-          _buildProgressBar(),
-          Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              itemCount: flashcards.length,
-              itemBuilder: (context, index) {
-                _cardKeys.putIfAbsent(index, () => GlobalKey<FlipCardState>());
-                return FlashcardWidget(
-                  flashcard: flashcards[index],
-                  onFavorite: _toggleFavorite,
-                  onLearned: _toggleLearned,
-                  cardKey: _cardKeys[index]!,
-                );
-              },
-            ),
-          ),
-          _buildNavigationBar(),
-        ],
-      ),
+      body: selectedUnit == null ? _buildUnitList() : _buildFlashcards(),
     );
   }
 
-  Widget _buildProgressBar() {
-    int learnedCount = flashcards.where((f) => f.isLearned).length;
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Column(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: LinearProgressIndicator(
-              value: learnedCount / flashcards.length,
-              backgroundColor: Colors.grey.withOpacity(0.2),
-              valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF6A11CB)),
-              minHeight: 6,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            "$learnedCount/${flashcards.length} Kelime Öğrenildi",
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: Colors.black87,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildNavigationBar() {
-    return Container(
+  Widget _buildUnitList() {
+    return ListView.builder(
       padding: const EdgeInsets.all(16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          IconButton(
-            icon: const Icon(Icons.arrow_back_ios),
-            onPressed: () => _pageController.previousPage(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
+      itemCount: units.keys.length,
+      itemBuilder: (context, index) {
+        String unitName = units.keys.elementAt(index);
+        return Padding(
+          padding: const EdgeInsets.only(bottom: 12),
+          child: Card(
+            elevation: 2,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-            color: const Color(0xFF6A11CB),
-          ),
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: () {
-              final currentIndex = _pageController.page?.round() ?? 0;
-              _cardKeys[currentIndex]?.currentState?.toggleCard();
-            },
-            color: const Color(0xFF6A11CB),
-          ),
-          IconButton(
-            icon: const Icon(Icons.arrow_forward_ios),
-            onPressed: () => _pageController.nextPage(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-            ),
-            color: const Color(0xFF6A11CB),
-          ),
-        ],
-      ),
-    );
-  }
-
-  void _showFilterDialog() {
-    showDialog(
-      context: context,
-      builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                "Filtreleme Seçenekleri",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(12),
+              onTap: () => setState(() {
+                selectedUnit = unitName;
+                filteredFlashcards = units[selectedUnit]!;
+              }),
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                child: Row(
+                  children: [
+                    // Sol taraftaki mor daire içinde kelime sayısı
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurple.withOpacity(0.1),
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${units[unitName]!.length}',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.deepPurple,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    // Ünite adı ve kelime sayısı yazısı
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            unitName,
+                            style: const TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            "Bu ünitede ${units[unitName]!.length} adet kelime var.",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey[600],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    // Sağ taraftaki ok ikonu
+                    Icon(
+                      Icons.arrow_forward_ios,
+                      color: Colors.grey[400],
+                      size: 20,
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 20),
-              _buildFilterOption(
-                "Tüm Kelimeler",
-                Icons.list,
-                () {
-                  setState(() => flashcards = sampleFlashcards);
-                  Navigator.pop(context);
-                },
-              ),
-              const SizedBox(height: 10),
-              _buildFilterOption(
-                "Sadece Favoriler",
-                Icons.favorite,
-                () {
-                  setState(() {
-                    flashcards = sampleFlashcards.where((f) => f.isFavorite).toList();
-                  });
-                  Navigator.pop(context);
-                },
-              ),
-              const SizedBox(height: 10),
-              _buildFilterOption(
-                "Öğrenilmemiş Kelimeler",
-                Icons.school,
-                () {
-                  setState(() {
-                    flashcards = sampleFlashcards.where((f) => !f.isLearned).toList();
-                  });
-                  Navigator.pop(context);
-                },
-              ),
-            ],
+            ),
           ),
+        );
+      },
+    );
+  }
+
+  Widget _buildFlashcards() {
+    return Center(
+      child: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.8,
+        height: MediaQuery.of(context).size.height * 0.6,
+        child: PageView.builder(
+          controller: _pageController,
+          itemCount: filteredFlashcards.length,
+          physics: const BouncingScrollPhysics(),
+          padEnds: false,
+          itemBuilder: (context, index) {
+            _cardKeys.putIfAbsent(index, () => GlobalKey<FlipCardState>());
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: FlashcardWidget(
+                flashcard: filteredFlashcards[index],
+                onFavorite: (flashcard) => setState(() => flashcard.isFavorite = !flashcard.isFavorite),
+                onLearned: (flashcard) => setState(() => flashcard.isLearned = !flashcard.isLearned),
+                cardKey: _cardKeys[index]!,
+              ),
+            );
+          },
         ),
       ),
     );
   }
-
-  Widget _buildFilterOption(String title, IconData icon, VoidCallback onTap) {
-    return ListTile(
-      leading: Icon(icon, color: const Color(0xFF6A11CB)),
-      title: Text(
-        title,
-        style: const TextStyle(fontWeight: FontWeight.w500),
-      ),
-      onTap: onTap,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10),
-      ),
-      tileColor: const Color(0xFF6A11CB).withOpacity(0.1),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      dense: true,
-    );
-  }
-
-  void _toggleFavorite(Flashcard flashcard) {
-    setState(() {
-      flashcard.isFavorite = !flashcard.isFavorite;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            flashcard.isFavorite
-                ? "${flashcard.english} favorilere eklendi!"
-                : "${flashcard.english} favorilerden çıkarıldı!",
-          ),
-          duration: const Duration(seconds: 1),
-        ),
-      );
-    });
-  }
-
-  void _toggleLearned(Flashcard flashcard) {
-    setState(() {
-      flashcard.isLearned = !flashcard.isLearned;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            flashcard.isLearned
-                ? "${flashcard.english} öğrenildi olarak işaretlendi!"
-                : "${flashcard.english} öğrenilmedi olarak işaretlendi!",
-          ),
-          duration: const Duration(seconds: 1),
-        ),
-      );
-    });
-  }
-
-
 
   @override
   void dispose() {

@@ -13,6 +13,7 @@ import 'screens/quiz_screen.dart';
 import 'screens/chatbot_screen.dart';
 import 'screens/favorites_screen.dart';
 import 'screens/profile_screen.dart';
+import 'firebase_options.dart';
 
 
 void main() async {

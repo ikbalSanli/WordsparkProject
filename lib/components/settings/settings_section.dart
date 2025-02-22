@@ -7,35 +7,12 @@ Widget buildSettingsSection() {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Column(
         children: [
-          _buildSettingsTile(
-            Icons.edit,
-            'Profili Düzenle',
-            () {
-              // Profil düzenleme sayfasına yönlendirme
-            },
-          ),
           const Divider(height: 1),
           _buildSettingsTile(
             Icons.lock,
             'Şifre Değiştir',
             () {
               // Şifre değiştirme sayfasına yönlendirme
-            },
-          ),
-          const Divider(height: 1),
-          _buildSettingsTile(
-            Icons.notifications,
-            'Bildirim Ayarları',
-            () {
-              // Bildirim ayarları sayfasına yönlendirme
-            },
-          ),
-          const Divider(height: 1),
-          _buildSettingsTile(
-            Icons.security,
-            'Gizlilik Ayarları',
-            () {
-              // Gizlilik ayarları sayfasına yönlendirme
             },
           ),
         ],
