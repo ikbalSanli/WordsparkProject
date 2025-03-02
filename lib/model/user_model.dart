@@ -15,7 +15,7 @@ class UserModel {
     required this.gender,
     required this.birthDate,
     DateTime? createdAt,  
-  }) : this.createdAt = createdAt ?? DateTime.now(); 
+  }) : createdAt = createdAt ?? DateTime.now(); 
 
   Map<String, dynamic> toJson() => {
     'id': id,

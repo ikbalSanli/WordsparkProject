@@ -13,7 +13,6 @@ import 'screens/quiz_screen.dart';
 import 'screens/chatbot_screen.dart';
 import 'screens/favorites_screen.dart';
 import 'screens/profile_screen.dart';
-import 'firebase_options.dart';
 
 
 void main() async {
@@ -45,12 +44,12 @@ class MyApp extends StatelessWidget {
         '/register': (context) =>  const RegisterScreen(),
         '/controller': (context) =>  const ControlScreen(),
         '/home': (context) => const HomeScreen(),
-        '/flashcards': (context) => const FlashcardsScreen(),
-        '/reading': (context) => ReadingScreen(),
-        '/grammar': (context) => GrammarScreen(),
-        '/quiz': (context) => QuizScreen(),
-        '/chatbot': (context) => ChatbotScreen(),
-        '/favorites': (context) => FavoritesScreen(),
+        '/flashcards': (context) =>  const FlashcardsScreen(),
+        '/reading': (context) => const ReadingScreen(),
+        '/grammar': (context) => const GrammarScreen(),
+        '/quiz': (context) => const QuizScreen(),
+        '/chatbot': (context) => const ChatbotScreen(),
+        '/favorites': (context) => const FavoritesScreen(),
         '/profile': (context) => const ProfileScreen(),
       },
     );

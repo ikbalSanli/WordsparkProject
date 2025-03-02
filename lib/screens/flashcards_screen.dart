@@ -1,230 +1,258 @@
 import 'package:flutter/material.dart';
-import 'package:flip_card/flip_card.dart';
-import 'package:wordspark/components/flashcard/flashcard_widget.dart';
-import 'package:wordspark/model/flashcard_model.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+void main() {
+  runApp(const MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Kelime Kartları',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.purple,
+        scaffoldBackgroundColor: const Color(0xFF2C2C2E),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF4A148C),
+          elevation: 0,
+        ),
+      ),
+      home: const FlashcardsScreen(),
+    );
+  }
+}
 
 class FlashcardsScreen extends StatefulWidget {
   const FlashcardsScreen({super.key});
 
   @override
-  State<FlashcardsScreen> createState() => _FlashcardsScreenState();
+  _FlashcardsScreenState createState() => _FlashcardsScreenState();
 }
 
 class _FlashcardsScreenState extends State<FlashcardsScreen> {
-  late PageController _pageController;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   String? selectedUnit;
-  final Map<int, GlobalKey<FlipCardState>> _cardKeys = {};
-
-  final Map<String, List<Flashcard>> units = {
-    "Ünite 1 - Food": [
-      Flashcard(english: "Apple", turkish: "Elma", example: "I eat an apple every day."),
-      Flashcard(english: "Water", turkish: "Su", example: "I drink water every day."),
-    ],
-    "Ünite 2 - Buildings": [
-      Flashcard(english: "House", turkish: "Ev", example: "This is my house."),
-    ],
-    "Ünite 3 - Education": [
-      Flashcard(english: "Book", turkish: "Kitap", example: "I love reading books."),
-    ],
-  };
-
-  List<Flashcard> filteredFlashcards = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _pageController = PageController();
-    filteredFlashcards = units["Ünite 1 - Food"]!;
-  }
-
-  void _filterFlashcards(String filter) {
-    setState(() {
-      if (filter == 'Öğrendiklerim') {
-        filteredFlashcards = units[selectedUnit]!.where((flashcard) => flashcard.isLearned).toList();
-      } else if (filter == 'Favorilerim') {
-        filteredFlashcards = units[selectedUnit]!.where((flashcard) => flashcard.isFavorite).toList();
-      } else {
-        filteredFlashcards = units[selectedUnit]!;
-      }
-      Navigator.pop(context);
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(selectedUnit == null ? "Üniteler" : selectedUnit!),
-        backgroundColor: Colors.deepPurple,
-        leading: selectedUnit != null
-            ? IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => setState(() => selectedUnit = null),
-        )
-            : null,
-        actions: selectedUnit == null
-            ? null
-            : [
-          Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.menu),
-              onPressed: () => Scaffold.of(context).openEndDrawer(),
-            ),
-          ),
-        ],
+        title: const Text('Kelime Kartları'),
       ),
-
-
-      endDrawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(color: Colors.deepPurple),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text("Kelime Kartları", style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold)),
-                  SizedBox(height: 8),
-                  Text("Filtreleme Seçenekleri", style: TextStyle(color: Colors.white70, fontSize: 16)),
-                ],
+      body: Column(
+        children: [
+          // Ünite Seçimi
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              decoration: BoxDecoration(
+                color: Colors.purple.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.purple.withOpacity(0.3)),
               ),
-            ),
-            ListTile(
-              leading: const Icon(Icons.list, color: Colors.deepPurple),
-              title: const Text("Tüm Kelimeler"),
-              onTap: () => _filterFlashcards("Tüm Kelimeler"),
-            ),
-            ListTile(
-              leading: const Icon(Icons.check_circle, color: Colors.deepPurple),
-              title: const Text("Öğrendiklerim"),
-              onTap: () => _filterFlashcards("Öğrendiklerim"),
-            ),
-            ListTile(
-              leading: const Icon(Icons.favorite, color: Colors.deepPurple),
-              title: const Text("Favorilerim"),
-              onTap: () => _filterFlashcards("Favorilerim"),
-            ),
-          ],
-        ),
-      ),
-      body: selectedUnit == null ? _buildUnitList() : _buildFlashcards(),
-    );
-  }
-
-  Widget _buildUnitList() {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: units.keys.length,
-      itemBuilder: (context, index) {
-        String unitName = units.keys.elementAt(index);
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 12),
-          child: Card(
-            elevation: 2,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () => setState(() {
-                selectedUnit = unitName;
-                filteredFlashcards = units[selectedUnit]!;
-              }),
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-                child: Row(
-                  children: [
-                    // Sol taraftaki mor daire içinde kelime sayısı
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: Colors.deepPurple.withOpacity(0.1),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${units[unitName]!.length}',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.deepPurple,
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    // Ünite adı ve kelime sayısı yazısı
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            unitName,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black87,
-                            ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            "Bu ünitede ${units[unitName]!.length} adet kelime var.",
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    // Sağ taraftaki ok ikonu
-                    Icon(
-                      Icons.arrow_forward_ios,
-                      color: Colors.grey[400],
-                      size: 20,
-                    ),
-                  ],
+              child: DropdownButtonHideUnderline(
+                child: DropdownButton<String>(
+                  dropdownColor: const Color(0xFF3A3A3C),
+                  isExpanded: true,
+                  hint: const Text(
+                    "Ünite Seçin",
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                  value: selectedUnit,
+                  icon: const Icon(Icons.arrow_drop_down, color: Colors.purple),
+                  style: const TextStyle(color: Colors.white),
+                  onChanged: (newUnit) {
+                    setState(() {
+                      selectedUnit = newUnit;
+                    });
+                  },
+                  items: ['unit1', 'unit2', 'unit3']
+                      .map<DropdownMenuItem<String>>((String value) {
+                    return DropdownMenuItem<String>(
+                      value: value,
+                      child: Text(value),
+                    );
+                  }).toList(),
                 ),
               ),
             ),
           ),
-        );
-      },
-    );
-  }
 
-  Widget _buildFlashcards() {
-    return Center(
-      child: SizedBox(
-        width: MediaQuery.of(context).size.width * 0.8,
-        height: MediaQuery.of(context).size.height * 0.6,
-        child: PageView.builder(
-          controller: _pageController,
-          itemCount: filteredFlashcards.length,
-          physics: const BouncingScrollPhysics(),
-          padEnds: false,
-          itemBuilder: (context, index) {
-            _cardKeys.putIfAbsent(index, () => GlobalKey<FlipCardState>());
-            return Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: FlashcardWidget(
-                flashcard: filteredFlashcards[index],
-                onFavorite: (flashcard) => setState(() => flashcard.isFavorite = !flashcard.isFavorite),
-                onLearned: (flashcard) => setState(() => flashcard.isLearned = !flashcard.isLearned),
-                cardKey: _cardKeys[index]!,
+          // Kelime Kartları
+          if (selectedUnit == null)
+            const Expanded(
+              child: Center(
+                child: Text(
+                  'Lütfen bir ünite seçin',
+                  style: TextStyle(color: Colors.white70, fontSize: 18),
+                ),
               ),
-            );
-          },
-        ),
+            ),
+          if (selectedUnit != null)
+            Expanded(
+              child: StreamBuilder<QuerySnapshot>(
+                stream: _firestore
+                    .collection('flashcards')
+                    .doc(selectedUnit)
+                    .collection('words')
+                    .snapshots(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
+                      ),
+                    );
+                  }
+
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        "Bu üniteye henüz kelime eklenmemiş",
+                        style: TextStyle(color: Colors.white70),
+                      ),
+                    );
+                  }
+
+                  var flashcards = snapshot.data!.docs;
+
+                  return Column(
+                    children: [
+                      // Kartlar
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: flashcards.map<Widget>((flashcard) {
+                              String word = flashcard['word'];
+                              String meaning = flashcard['meaning'];
+
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 8),
+                                child: FlashcardCard(
+                                  word: word,
+                                  meaning: meaning,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+        ],
       ),
     );
   }
+}
+
+class FlashcardCard extends StatefulWidget {
+  final String word;
+  final String meaning;
+
+  const FlashcardCard({super.key, required this.word, required this.meaning});
 
   @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
+  _FlashcardCardState createState() => _FlashcardCardState();
+}
+
+class _FlashcardCardState extends State<FlashcardCard> {
+  bool _isFlipped = false;
+  bool _isLearned = false;
+  bool _isFavorite = false;
+
+  void _toggleCard() {
+    setState(() {
+      _isFlipped = !_isFlipped;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    double width = MediaQuery.of(context).size.width * 0.94; // Kart boyutunu ekran boyutuna göre ayarla
+
+    return GestureDetector(
+      onTap: _toggleCard,
+      child: AnimatedSwitcher(
+        duration: const Duration(milliseconds: 600),
+        child: Card(
+          key: ValueKey<bool>(_isFlipped),
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          color: _isLearned ? Colors.green.shade700 : Colors.purple.shade800,
+          child: Container(
+            padding: const EdgeInsets.all(20),
+            width: width, // Kart boyutunu ayarla
+            child: Column(
+              children: [
+                // Üst Butonlar
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        _isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: _isFavorite ? Colors.red : Colors.white70,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isFavorite = !_isFavorite;
+                        });
+                      },
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        _isLearned ? Icons.check_circle : Icons.check_circle_outline,
+                        color: _isLearned ? Colors.green.shade300 : Colors.white70,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _isLearned = !_isLearned;
+                        });
+                      },
+                    ),
+                  ],
+                ),
+                // İçerik
+                Expanded(
+                  child: Center(
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 600),
+                      child: Text(
+                        _isFlipped ? widget.meaning : widget.word,
+                        style: const TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                ),
+                // Alt Bilgi
+                Text(
+                  _isFlipped ? "Mean" : "Word",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 }
