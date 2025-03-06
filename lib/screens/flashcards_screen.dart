@@ -1,257 +1,251 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Kelime Kartları',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.purple,
-        scaffoldBackgroundColor: const Color(0xFF2C2C2E),
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF4A148C),
-          elevation: 0,
-        ),
-      ),
-      home: const FlashcardsScreen(),
-    );
-  }
-}
-
-class FlashcardsScreen extends StatefulWidget {
+class FlashcardsScreen extends StatelessWidget {
   const FlashcardsScreen({super.key});
-
-  @override
-  _FlashcardsScreenState createState() => _FlashcardsScreenState();
-}
-
-class _FlashcardsScreenState extends State<FlashcardsScreen> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  String? selectedUnit;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Kelime Kartları'),
-      ),
-      body: Column(
-        children: [
-          // Ünite Seçimi
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              decoration: BoxDecoration(
-                color: Colors.purple.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.purple.withOpacity(0.3)),
-              ),
-              child: DropdownButtonHideUnderline(
-                child: DropdownButton<String>(
-                  dropdownColor: const Color(0xFF3A3A3C),
-                  isExpanded: true,
-                  hint: const Text(
-                    "Ünite Seçin",
-                    style: TextStyle(color: Colors.white70),
-                  ),
-                  value: selectedUnit,
-                  icon: const Icon(Icons.arrow_drop_down, color: Colors.purple),
-                  style: const TextStyle(color: Colors.white),
-                  onChanged: (newUnit) {
-                    setState(() {
-                      selectedUnit = newUnit;
-                    });
-                  },
-                  items: ['unit1', 'unit2', 'unit3']
-                      .map<DropdownMenuItem<String>>((String value) {
-                    return DropdownMenuItem<String>(
-                      value: value,
-                      child: Text(value),
-                    );
-                  }).toList(),
+      appBar: AppBar(title: const Text("Kelime Kartları")),
+      body: ListView(
+        children: ["A1", "A2", "B1", "B2"].map((level) {
+          return ListTile(
+            title: Text(level, style: const TextStyle(fontSize: 20)),
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => WordListScreen(level: level),
                 ),
-              ),
-            ),
-          ),
-
-          // Kelime Kartları
-          if (selectedUnit == null)
-            const Expanded(
-              child: Center(
-                child: Text(
-                  'Lütfen bir ünite seçin',
-                  style: TextStyle(color: Colors.white70, fontSize: 18),
-                ),
-              ),
-            ),
-          if (selectedUnit != null)
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: _firestore
-                    .collection('flashcards')
-                    .doc(selectedUnit)
-                    .collection('words')
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
-                      ),
-                    );
-                  }
-
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return const Center(
-                      child: Text(
-                        "Bu üniteye henüz kelime eklenmemiş",
-                        style: TextStyle(color: Colors.white70),
-                      ),
-                    );
-                  }
-
-                  var flashcards = snapshot.data!.docs;
-
-                  return Column(
-                    children: [
-                      // Kartlar
-                      Expanded(
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: flashcards.map<Widget>((flashcard) {
-                              String word = flashcard['word'];
-                              String meaning = flashcard['meaning'];
-
-                              return Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 8),
-                                child: FlashcardCard(
-                                  word: word,
-                                  meaning: meaning,
-                                ),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
-        ],
+              );
+            },
+          );
+        }).toList(),
       ),
     );
   }
 }
 
-class FlashcardCard extends StatefulWidget {
-  final String word;
-  final String meaning;
-
-  const FlashcardCard({super.key, required this.word, required this.meaning});
+class WordListScreen extends StatelessWidget {
+  final String level;
+  const WordListScreen({super.key, required this.level});
 
   @override
-  _FlashcardCardState createState() => _FlashcardCardState();
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("$level Kelimeleri")),
+      body: StreamBuilder(
+        stream: FirebaseFirestore.instance
+            .collection('flashcards')
+            .where('level', isEqualTo: level)
+            .snapshots(),
+        builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(child: Text("Bu seviyede kelime bulunamadı."));
+          }
+          return Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: snapshot.data!.docs.map((doc) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 9.0),
+                    child: FlashcardWidget(doc: doc),
+                  );
+                }).toList(),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
-class _FlashcardCardState extends State<FlashcardCard> {
+class FlashcardWidget extends StatefulWidget {
+  final DocumentSnapshot doc;
+
+  const FlashcardWidget({super.key, required this.doc});
+
+  @override
+  _FlashcardWidgetState createState() => _FlashcardWidgetState();
+}
+
+class _FlashcardWidgetState extends State<FlashcardWidget> with TickerProviderStateMixin {
   bool _isFlipped = false;
-  bool _isLearned = false;
-  bool _isFavorite = false;
+  late AnimationController _controller;
+  late Animation<double> _rotation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
+
+    _rotation = Tween<double>(begin: 0.0, end: 3.14159).animate(_controller);
+  }
 
   void _toggleCard() {
+    if (_isFlipped) {
+      _controller.reverse();
+    } else {
+      _controller.forward();
+    }
     setState(() {
       _isFlipped = !_isFlipped;
     });
   }
 
+  void _toggleFavorite() {
+    // Toggle favorite status in Firestore
+    FirebaseFirestore.instance.collection('flashcards').doc(widget.doc.id).update({
+      'favorite': !(widget.doc['favorite'] ?? false),
+    });
+  }
+
+  void _markLearned() {
+    // Toggle learned status in Firestore
+    FirebaseFirestore.instance.collection('flashcards').doc(widget.doc.id).update({
+      'learned': !(widget.doc['learned'] ?? false),
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    double width = MediaQuery.of(context).size.width * 0.94; // Kart boyutunu ekran boyutuna göre ayarla
-
     return GestureDetector(
       onTap: _toggleCard,
-      child: AnimatedSwitcher(
-        duration: const Duration(milliseconds: 600),
-        child: Card(
-          key: ValueKey<bool>(_isFlipped),
-          elevation: 4,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          color: _isLearned ? Colors.green.shade700 : Colors.purple.shade800,
-          child: Container(
-            padding: const EdgeInsets.all(20),
-            width: width, // Kart boyutunu ayarla
-            child: Column(
-              children: [
-                // Üst Butonlar
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        _isFavorite ? Icons.favorite : Icons.favorite_border,
-                        color: _isFavorite ? Colors.red : Colors.white70,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _isFavorite = !_isFavorite;
-                        });
-                      },
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        _isLearned ? Icons.check_circle : Icons.check_circle_outline,
-                        color: _isLearned ? Colors.green.shade300 : Colors.white70,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _isLearned = !_isLearned;
-                        });
-                      },
-                    ),
-                  ],
-                ),
-                // İçerik
-                Expanded(
-                  child: Center(
-                    child: AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 600),
-                      child: Text(
-                        _isFlipped ? widget.meaning : widget.word,
-                        style: const TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                ),
-                // Alt Bilgi
-                Text(
-                  _isFlipped ? "Mean" : "Word",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
-                ),
-              ],
-            ),
+      child: Card(
+        elevation: 5,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Transform(
+              transform: Matrix4.rotationY(_rotation.value),
+              alignment: Alignment.center,
+              child: child,
+            );
+          },
+          child: _isFlipped
+              ? CardContent(
+            content: widget.doc['meaning'] ?? 'No meaning available',
+            isBack: true,
+            isFavorite: widget.doc['favorite'] ?? false,
+            isLearned: widget.doc['learned'] ?? false,
+            onFavoriteTap: _toggleFavorite,
+            onLearnedTap: _markLearned,
+          )
+              : CardContent(
+            content: widget.doc['word'] ?? 'No word available',
+            isBack: false,
+            isFavorite: widget.doc['favorite'] ?? false,
+            isLearned: widget.doc['learned'] ?? false,
+            onFavoriteTap: _toggleFavorite,
+            onLearnedTap: _markLearned,
           ),
         ),
+      ),
+    );
+  }
+}
+
+class CardContent extends StatelessWidget {
+  final String content;
+  final bool isBack;
+  final bool isFavorite;
+  final bool isLearned;
+  final VoidCallback onFavoriteTap;
+  final VoidCallback onLearnedTap;
+
+  const CardContent({
+    super.key,
+    required this.content,
+    required this.isBack,
+    required this.isFavorite,
+    required this.isLearned,
+    required this.onFavoriteTap,
+    required this.onLearnedTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 350,
+      padding: const EdgeInsets.all(50.0),
+      decoration: BoxDecoration(
+        color: isBack ? Colors.blueAccent : Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            content,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: isBack ? Colors.white : Colors.black,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 20),
+          if (!isBack)
+    Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            IconButton(
+              icon: Icon(
+                isFavorite ? Icons.heart_broken : Icons.heart_broken_outlined,
+                color: Colors.red,
+              ),
+              onPressed: onFavoriteTap,
+            ),
+            IconButton(
+              icon: Icon(
+                isLearned ? Icons.check_circle : Icons.check_circle_outline,
+                color: Colors.green,
+              ),
+              onPressed: onLearnedTap,
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              'Favorim',
+              style: TextStyle(fontSize: 16, color: Colors.red),
+            ),
+            const SizedBox(width: 5),
+            Text(
+              'Öğrendim',
+              style: TextStyle(fontSize: 16, color: Colors.green),
+            ),
+          ],
+        ),
+      ],
+    )
+],
       ),
     );
   }

@@ -1,58 +1,100 @@
 import 'package:flutter/material.dart';
-import '../service/word_service.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class FlashcardWordsScreen extends StatefulWidget {
-  final String unitId;
-  final String unitName;
+class FlashcardWordsScreen extends StatelessWidget {
+  final String unit;
 
-  const FlashcardWordsScreen({super.key, required this.unitId, required this.unitName});
-
-  @override
-  _FlashcardWordsScreenState createState() => _FlashcardWordsScreenState();
-}
-
-class _FlashcardWordsScreenState extends State<FlashcardWordsScreen> {
-  final WordService _wordService = WordService();
-  List<Map<String, dynamic>> words = [];
-  bool isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    fetchWords();
-  }
-
-  void fetchWords() async {
-   // List<Map<String, dynamic>> fetchedWords = await _wordService.getWordsByUnit(widget.unitId);
-    setState(() {
-     //words = fetchedWords;
-      isLoading = false;
-    });
-  }
+  const FlashcardWordsScreen({super.key, required this.unit});
 
   @override
   Widget build(BuildContext context) {
+    final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
     return Scaffold(
-      appBar: AppBar(title: Text(widget.unitName)),
-      body: isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : ListView.builder(
-        itemCount: words.length,
-        itemBuilder: (context, index) {
-          var word = words[index];
-          return Card(
-            child: ListTile(
-              title: Text(word['word'], style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-              subtitle: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Anlam: ${word['meaning']}", style: const TextStyle(fontSize: 16)),
-                  Text("Örnek: ${word['example']}", style: const TextStyle(fontSize: 14, fontStyle: FontStyle.italic)),
-                ],
-              ),
+      appBar: AppBar(
+        title: Text('$unit Kelimeleri'),
+        backgroundColor: const Color(0xFF4A148C),
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: _firestore
+            .collection('flashcards')
+            .doc(unit)
+            .collection('words')
+            .snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return const Center(
+              child: Text("Bu üniteye henüz kelime eklenmemiş"),
+            );
+          }
+
+          var flashcards = snapshot.data!.docs;
+
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: flashcards.map<Widget>((flashcard) {
+                String word = flashcard['word'];
+                String meaning = flashcard['meaning'];
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8),
+                  child: FlashcardCard(
+                    word: word,
+                    meaning: meaning,
+                  ),
+                );
+              }).toList(),
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class FlashcardCard extends StatelessWidget {
+  final String word;
+  final String meaning;
+
+  const FlashcardCard({super.key, required this.word, required this.meaning});
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      elevation: 4,
+      color: Colors.purple.shade800, // Kartın rengini belirleyebilirsiniz
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        width: 200, // Kart genişliği
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              word, // Kelimeyi göster
+              style: const TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              meaning, // Anlamı göster
+              style: const TextStyle(
+                fontSize: 18,
+                color: Colors.white70,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
