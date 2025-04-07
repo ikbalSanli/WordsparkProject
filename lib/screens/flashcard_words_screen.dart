@@ -69,7 +69,7 @@ class FlashcardCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 4,
-      color: Colors.purple.shade800, // Kartın rengini belirleyebilirsiniz
+      color: Colors.purple.shade800,
       child: Container(
         padding: const EdgeInsets.all(16),
         width: 200, // Kart genişliği

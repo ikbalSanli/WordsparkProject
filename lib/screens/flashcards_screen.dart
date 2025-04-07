@@ -40,7 +40,7 @@ class FlashcardsScreen extends StatelessWidget {
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: ListView(
-            children: ["A1", "A2", "B1", "B2"].map((level) {
+            children: ["A1", "A2", "B1", "B2", "C1", "C2"].map((level) {
               return Card(
                 margin: const EdgeInsets.symmetric(vertical: 8.0),
                 child: ListTile(
@@ -160,6 +160,9 @@ class _WordListScreenState extends State<WordListScreen> {
                     );
                   }
 
+                  // Verileri rastgele sırala
+                  final List<DocumentSnapshot> orderedDocs = snapshot.data!.docs.toList();
+
                   return Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Column(
@@ -174,9 +177,10 @@ class _WordListScreenState extends State<WordListScreen> {
                           ),
                         ),
                         const SizedBox(height: 8),
+
                         // Kart sayacı
                         Text(
-                          "${snapshot.data!.docs.length} kelime bulundu",
+                          "${orderedDocs.length} kelime bulundu",
                           style: const TextStyle(
                             fontSize: 14,
                             color: Color(0xFF6A1B9A),
@@ -189,16 +193,16 @@ class _WordListScreenState extends State<WordListScreen> {
                         Expanded(
                           child: PageView.builder(
                             controller: PageController(viewportFraction: 1.0),
-                            itemCount: snapshot.data!.docs.length,
+                            itemCount: orderedDocs.length,
                             itemBuilder: (context, index) {
                               return Center(
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: FlashcardWidget(
-                                    doc: snapshot.data!.docs[index],
+                                    doc: orderedDocs[index], // shuffledDocs yerine orderedDocs kullanıldı
                                     screenSize: screenSize,
                                     currentIndex: index + 1,
-                                    totalCards: snapshot.data!.docs.length,
+                                    totalCards: orderedDocs.length,
                                   ),
                                 ),
                               );
