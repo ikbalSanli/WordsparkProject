@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wordspark/components/bottom_navigator_button.dart';
-import 'package:wordspark/screens/favorites_screen.dart';
+import 'package:wordspark/screens/chat_screen.dart';
 import 'package:wordspark/screens/home_screen.dart';
 import 'package:wordspark/screens/profile_screen.dart';
 import 'package:wordspark/style/colors.dart';
@@ -35,7 +35,7 @@ class _ControlScreenState extends State<ControlScreen> {
             index = newIndex;
           });
         },
-        children:  const [HomeScreen(), FavoritesScreen(), ProfileScreen()],
+        children:  const [HomeScreen(), ChatScreen(), ProfileScreen()],
       ),
       bottomNavigationBar: BottomAppBar(
         elevation: 0,
@@ -59,7 +59,7 @@ class _ControlScreenState extends State<ControlScreen> {
                   _pageController.animateToPage(1,
                       duration: const Duration(milliseconds: 500),
                       curve: Curves.easeInOut);
-                }, index, 1, "Favoriler", Icons.favorite),
+                }, index, 1, "Chat", Icons.smart_toy_rounded),
                 bottomNavigatorButton(() {
                   _pageController.animateToPage(2,
                       duration: const Duration(milliseconds: 500),

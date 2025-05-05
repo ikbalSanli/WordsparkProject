@@ -11,15 +11,14 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  // Define a consistent color palette
-  final Color primaryColor = const Color(0xFF6A1B9A); // Deep Purple 800
-  final Color secondaryColor = const Color(0xFF9C27B0); // Purple 500
-  final Color accentColor = const Color(0xFFE1BEE7); // Purple 100
-  final Color backgroundColor = const Color(0xFFF9F7FC); // Light purple tint
-  final Color textPrimaryColor = const Color(0xFF424242); // Grey 800
-  final Color textSecondaryColor = const Color(0xFF757575); // Grey 600
+  final Color primaryColor = const Color(0xFF6A1B9A);
+  final Color secondaryColor = const Color(0xFF9C27B0);
+  final Color accentColor = const Color(0xFFE1BEE7);
+  final Color backgroundColor = const Color(0xFFF9F7FC);
+  final Color textPrimaryColor = const Color(0xFF424242);
+  final Color textSecondaryColor = const Color(0xFF757575);
 
-  String userName = "Loading..."; // Default value
+  String userName = "Loading...";
   final AuthService _authService = AuthService();
 
   @override
@@ -55,7 +54,6 @@ class _HomeScreenState extends State<HomeScreen> {
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
           slivers: [
-            // Header Section
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
@@ -113,7 +111,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Progress Section
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
@@ -141,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text(
-                            'Günlük İlerleme',
+                            'İlerleme',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 20,
@@ -240,7 +237,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Stats Cards
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -268,7 +264,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Section Title
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 28, 24, 16),
@@ -283,7 +278,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Features Grid
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               sliver: SliverGrid(
@@ -322,7 +316,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // AI Assistant Card
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.all(24),

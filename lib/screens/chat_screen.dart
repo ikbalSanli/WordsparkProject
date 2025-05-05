@@ -2,20 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
-class ChatbotScreen extends StatefulWidget {
-  const ChatbotScreen({super.key});
+class ChatScreen extends StatefulWidget {
+  const ChatScreen({super.key});
 
   @override
-  State<ChatbotScreen> createState() => _ChatbotScreenState();
+  State<ChatScreen> createState() => _ChatbotScreenState();
 }
 
-class _ChatbotScreenState extends State<ChatbotScreen> with TickerProviderStateMixin {
+class _ChatbotScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final Gemini gemini = Gemini.instance;
   final TextEditingController textEditingController = TextEditingController();
   final ScrollController _listScrollController = ScrollController();
   final FocusNode focusNode = FocusNode();
 
-  // Daha profesyonel bir renk paleti
   final Color primaryColor = const Color(0xFF7E57C2); // Ana mor renk
   final Color secondaryColor = const Color(0xFF5E35B1); // Koyu mor
   final Color accentColor = const Color(0xFFB39DDB); // Açık mor

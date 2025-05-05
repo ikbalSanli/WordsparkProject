@@ -12,7 +12,6 @@ Widget buildSettingsSection() {
             Icons.lock,
             'Şifre Değiştir',
             () {
-              // Şifre değiştirme sayfasına yönlendirme
             },
           ),
         ],

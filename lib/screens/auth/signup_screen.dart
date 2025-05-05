@@ -96,7 +96,7 @@ class _RegisterScreenState extends State<RegisterScreen>
 
     try {
       final userModel = UserModel(
-        id: '',  // Firebase tarafından doldurulacak
+        id: '',
         email: emailController.text.trim(),
         firstName: firstNameController.text.trim(),
         lastName: lastNameController.text.trim(),

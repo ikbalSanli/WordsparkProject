@@ -11,12 +11,14 @@ import 'screens/reading_screen.dart';
 import 'screens/grammar_screen.dart';
 import 'screens/quiz_screen.dart';
 import 'screens/chatbot_screen.dart';
-import 'screens/favorites_screen.dart';
+import 'screens/chat_screen.dart';
 import 'screens/profile_screen.dart';
+import 'package:flutter_gemini/flutter_gemini.dart';
 
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Gemini.init(apiKey: 'AIzaSyCmqHj8yoA2164dF_mJZ_i1eaLAYCC1haA');
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -49,11 +51,10 @@ class MyApp extends StatelessWidget {
         '/grammar': (context) => const GrammarScreen(),
         '/quiz': (context) => const QuizScreen(),
         '/chatbot': (context) => const ChatbotScreen(),
-        '/favorites': (context) => const FavoritesScreen(),
+        '/chat': (context) => const ChatScreen(),
         '/profile': (context) => const ProfileScreen(),
       },
     );
   }
 }
-
 

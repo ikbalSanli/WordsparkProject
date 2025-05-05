@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-// Ana tema renkleri
 final ThemeData appTheme = ThemeData(
-  primaryColor: const Color(0xFF6A1B9A), // Koyu mor
+  primaryColor: const Color(0xFF6A1B9A),
   colorScheme: ColorScheme.fromSwatch().copyWith(
     primary: const Color(0xFF6A1B9A),
-    secondary: const Color(0xFF9C27B0), // Orta mor
-    background: const Color(0xFFF3E5F5), // Açık mor arka plan
+    secondary: const Color(0xFF9C27B0),
+    background: const Color(0xFFF3E5F5),
   ),
   appBarTheme: const AppBarTheme(
     backgroundColor: Color(0xFF6A1B9A),
@@ -84,12 +83,10 @@ class WordListScreen extends StatefulWidget {
 }
 
 class _WordListScreenState extends State<WordListScreen> {
-  // Filtreleme seçenekleri
-  String _filterOption = "all"; // "all", "favorites", "learned"
+  String _filterOption = "all";
 
   @override
   Widget build(BuildContext context) {
-    // Ekran boyutunu al
     final Size screenSize = MediaQuery.of(context).size;
 
     return Theme(
@@ -108,7 +105,6 @@ class _WordListScreenState extends State<WordListScreen> {
         ),
         body: Column(
           children: [
-            // Aktif filtre bilgisi
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
@@ -121,7 +117,6 @@ class _WordListScreenState extends State<WordListScreen> {
               ),
             ),
 
-            // Ekranın büyük kısmını kaplayacak kartlar
             Expanded(
               child: StreamBuilder(
                 stream: _getFilteredStream(),
@@ -160,7 +155,6 @@ class _WordListScreenState extends State<WordListScreen> {
                     );
                   }
 
-                  // Verileri rastgele sırala
                   final List<DocumentSnapshot> orderedDocs = snapshot.data!.docs.toList();
 
                   return Padding(
@@ -178,7 +172,6 @@ class _WordListScreenState extends State<WordListScreen> {
                         ),
                         const SizedBox(height: 8),
 
-                        // Kart sayacı
                         Text(
                           "${orderedDocs.length} kelime bulundu",
                           style: const TextStyle(
@@ -189,7 +182,6 @@ class _WordListScreenState extends State<WordListScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Sayfada tek kart görüntüle
                         Expanded(
                           child: PageView.builder(
                             controller: PageController(viewportFraction: 1.0),
@@ -199,7 +191,7 @@ class _WordListScreenState extends State<WordListScreen> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: FlashcardWidget(
-                                    doc: orderedDocs[index], // shuffledDocs yerine orderedDocs kullanıldı
+                                    doc: orderedDocs[index],
                                     screenSize: screenSize,
                                     currentIndex: index + 1,
                                     totalCards: orderedDocs.length,
@@ -221,7 +213,6 @@ class _WordListScreenState extends State<WordListScreen> {
     );
   }
 
-  // Filtreleme seçeneklerini göster
   void _showFilterOptions() {
     showModalBottomSheet(
       context: context,
@@ -266,7 +257,6 @@ class _WordListScreenState extends State<WordListScreen> {
     );
   }
 
-  // Filtre seçeneği oluştur
   Widget _buildFilterOption({
     required IconData icon,
     required String title,
@@ -305,7 +295,6 @@ class _WordListScreenState extends State<WordListScreen> {
     );
   }
 
-  // Filtreye göre stream oluştur
   Stream<QuerySnapshot> _getFilteredStream() {
     Query query = FirebaseFirestore.instance
         .collection('flashcards')
@@ -320,7 +309,6 @@ class _WordListScreenState extends State<WordListScreen> {
     return query.snapshots();
   }
 
-  // Filtreye göre açıklama metni
   String _getFilterText() {
     switch (_filterOption) {
       case "favorites":
@@ -365,7 +353,6 @@ class _FlashcardWidgetState extends State<FlashcardWidget> with TickerProviderSt
       duration: const Duration(milliseconds: 500),
     );
 
-    // Ön yüz animasyonu (0 -> pi/2)
     _frontRotation = Tween<double>(begin: 0.0, end: 3.14159 / 2).animate(
       CurvedAnimation(
         parent: _controller,
@@ -373,7 +360,6 @@ class _FlashcardWidgetState extends State<FlashcardWidget> with TickerProviderSt
       ),
     );
 
-    // Arka yüz animasyonu (pi/2 -> 0)
     _backRotation = Tween<double>(begin: 3.14159 / 2, end: 0.0).animate(
       CurvedAnimation(
         parent: _controller,
@@ -413,13 +399,11 @@ class _FlashcardWidgetState extends State<FlashcardWidget> with TickerProviderSt
 
   @override
   Widget build(BuildContext context) {
-    // Ekran boyutlarına göre kart boyutlarını hesapla
     final double cardWidth = widget.screenSize.width * 0.9;
     final double cardHeight = widget.screenSize.height * 0.65;
 
     return Column(
       children: [
-        // Kart numarası göster
         Text(
           "${widget.currentIndex} / ${widget.totalCards}",
           style: TextStyle(
@@ -469,13 +453,12 @@ class _FlashcardWidgetState extends State<FlashcardWidget> with TickerProviderSt
     required double width,
     required double height,
   }) {
-    // Kartın görünürlüğünü ve rotasyonunu ayarla
     return Visibility(
       visible: isVisible,
       child: Transform(
         alignment: Alignment.center,
         transform: Matrix4.identity()
-          ..setEntry(3, 2, 0.001) // Perspektif efekti
+          ..setEntry(3, 2, 0.001)
           ..rotateY(rotation),
         child: Card(
           elevation: 8,
@@ -512,7 +495,6 @@ class _FlashcardWidgetState extends State<FlashcardWidget> with TickerProviderSt
       ),
       child: Column(
         children: [
-          // Üst kısım - İçerik
           Expanded(
             child: Center(
               child: SingleChildScrollView(
@@ -531,7 +513,6 @@ class _FlashcardWidgetState extends State<FlashcardWidget> with TickerProviderSt
             ),
           ),
 
-          // Alt kısım - Butonlar (sadece ön yüzde)
           if (!isBack)
             Column(
               children: [
@@ -561,7 +542,6 @@ class _FlashcardWidgetState extends State<FlashcardWidget> with TickerProviderSt
     );
   }
 
-  // Ekran genişliğine göre font boyutu hesapla
   double _calculateFontSize(double width) {
     if (width < 300) {
       return 18;

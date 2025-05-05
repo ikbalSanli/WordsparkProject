@@ -7,11 +7,19 @@ class ReadingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Reading')),
+      appBar: AppBar(
+        title: const Text('Reading',style: TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          fontSize: 20,
+        ),),
+        centerTitle: true,
+        backgroundColor: Colors.purple[700],
+      ),
       body: StreamBuilder(
         stream: FirebaseFirestore.instance
             .collection('readings')
-            .orderBy('level') // Kolaydan zora sıralama
+            .orderBy('level')
             .snapshots(),
         builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -34,22 +42,27 @@ class ReadingScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
+                color: Colors.purple[50],
                 child: ListTile(
                   contentPadding: const EdgeInsets.all(12.0),
-                  leading: CircleAvatar(
-                    radius: 30,
-                    backgroundImage: NetworkImage(reading['imageUrl'] ??
-                        'https://i.imgur.com/xyz123.jpg'), // Varsayılan resim
-                  ),
                   title: Text(
                     reading['title'],
-                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.purple,
+                    ),
                   ),
                   subtitle: Text(
                     "Seviye: ${reading['level']}",
-                    style: TextStyle(color: getLevelColor(reading['level'])),
+                    style: TextStyle(
+                      color: getLevelColor(reading['level']),
+                    ),
                   ),
-                  trailing: const Icon(Icons.arrow_forward_ios),
+                  trailing: const Icon(
+                    Icons.arrow_forward_ios,
+                    color: Colors.purple,
+                  ),
                   onTap: () {
                     Navigator.push(
                       context,
@@ -58,8 +71,6 @@ class ReadingScreen extends StatelessWidget {
                           title: reading['title'],
                           content: reading['content'],
                           level: reading['level'],
-                          imageUrl: reading['imageUrl'] ??
-                              'https://via.placeholder.com/400', // Varsayılan resim
                         ),
                       ),
                     );
@@ -97,38 +108,42 @@ class ReadingDetailScreen extends StatelessWidget {
   final String title;
   final String content;
   final String level;
-  final String imageUrl;
 
   const ReadingDetailScreen({
     super.key,
     required this.title,
     required this.content,
     required this.level,
-    required this.imageUrl,
   });
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("$title - $level")),
+      appBar: AppBar(
+        title: Text("$title - $level"),
+        backgroundColor: Colors.purple[700],
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: Image.network(imageUrl, height: 200, width: double.infinity, fit: BoxFit.cover),
-              ),
               const SizedBox(height: 16),
               Text(
                 title,
-                style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.purple,
+                ),
               ),
               Text(
                 "Seviye: $level",
-                style: TextStyle(color: getLevelColor(level), fontSize: 18),
+                style: TextStyle(
+                  color: getLevelColor(level),
+                  fontSize: 18,
+                ),
               ),
               const SizedBox(height: 12),
               Text(
