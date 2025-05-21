@@ -14,6 +14,8 @@ import 'screens/chatbot_screen.dart';
 import 'screens/chat_screen.dart';
 import 'screens/profile_screen.dart';
 import 'package:flutter_gemini/flutter_gemini.dart';
+import 'package:wordspark/service/json_to_firestore.dart';
+
 
 
 void main() async {
@@ -22,6 +24,13 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  try {
+    await FirestoreUploader().uploadFlashcardsFromJson('assets/data/flashcards.json');
+  } catch (e) {
+    print('Veri yükleme hatası: $e');
+  }
+
+
   FirebaseAuth.instance.authStateChanges().listen((User? user) {
     if (user == null) {
       runApp(const MyApp(isAuthenticated: false));

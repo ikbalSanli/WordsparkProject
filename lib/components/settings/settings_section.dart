@@ -6,15 +6,7 @@ Widget buildSettingsSection() {
       elevation: 8,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: Column(
-        children: [
-          const Divider(height: 1),
-          _buildSettingsTile(
-            Icons.lock,
-            'Şifre Değiştir',
-            () {
-            },
-          ),
-        ],
+
       ),
     );
     

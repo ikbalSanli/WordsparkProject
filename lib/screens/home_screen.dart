@@ -113,206 +113,47 @@ class _HomeScreenState extends State<HomeScreen> {
 
             SliverToBoxAdapter(
               child: Padding(
-                padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
-                child: Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      colors: [primaryColor, secondaryColor],
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                    ),
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: primaryColor.withOpacity(0.25),
-                        blurRadius: 16,
-                        offset: const Offset(0, 8),
-                        spreadRadius: -2,
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'İlerleme',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Icon(
-                              Icons.trending_up_rounded,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 24),
-                      Container(
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: LayoutBuilder(
-                          builder: (context, constraints) {
-                            return Row(
-                              children: [
-                                Container(
-                                  width: constraints.maxWidth * 0.7,
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(4),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.white.withOpacity(0.5),
-                                        blurRadius: 6,
-                                        offset: const Offset(0, 0),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.auto_stories,
-                                color: Colors.white.withOpacity(0.8),
-                                size: 16,
-                              ),
-                              const SizedBox(width: 6),
-                              const Text(
-                                '70/100 kelime',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                              vertical: 6,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: const Text(
-                              '%70',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _buildEnhancedStatCard(
-                        title: 'Öğrenilen',
-                        value: '1,234',
-                        icon: Icons.auto_stories_rounded,
-                        color: const Color(0xFF4CAF50),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: _buildEnhancedStatCard(
-                        title: 'Favoriler',
-                        value: '56',
-                        icon: Icons.favorite_rounded,
-                        color: const Color(0xFFE91E63),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            SliverToBoxAdapter(
-              child: Padding(
                 padding: const EdgeInsets.fromLTRB(24, 28, 24, 16),
-                child: Text(
-                  'Özellikler',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: textPrimaryColor,
-                  ),
-                ),
               ),
             ),
 
+            // Kartlar alt alta dizilmiş halde
             SliverPadding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              sliver: SliverGrid(
+              sliver: SliverList(
                 delegate: SliverChildListDelegate([
                   _buildEnhancedFeatureCard(
                     title: 'Kelime Kartları',
+                    subtitle: 'Yeni kelimeler öğren ve tekrar et',
                     icon: Icons.style_rounded,
-                    gradient: const [Color(0xFF1976D2), Color(0xFF42A5F5)],
+                    gradient: const [Color(0xFF667eea), Color(0xFF764ba2)],
                     onTap: () => Navigator.pushNamed(context, '/flashcards'),
                   ),
+                  const SizedBox(height: 16),
                   _buildEnhancedFeatureCard(
                     title: 'Okuma',
+                    subtitle: 'Hikayeler okuyarak gelişim sağla',
                     icon: Icons.menu_book_rounded,
-                    gradient: const [Color(0xFF2E7D32), Color(0xFF66BB6A)],
+                    gradient: const [Color(0xFF11998e), Color(0xFF38ef7d)],
                     onTap: () => Navigator.pushNamed(context, '/reading'),
                   ),
+                  const SizedBox(height: 16),
                   _buildEnhancedFeatureCard(
                     title: 'Quiz',
+                    subtitle: 'Bilgini test et ve puanını artır',
                     icon: Icons.quiz_rounded,
-                    gradient: const [Color(0xFFC62828), Color(0xFFEF5350)],
+                    gradient: const [Color(0xFFf093fb), Color(0xFFf5576c)],
                     onTap: () => Navigator.pushNamed(context, '/quiz'),
                   ),
+                  const SizedBox(height: 16),
                   _buildEnhancedFeatureCard(
                     title: 'Gramer',
+                    subtitle: 'Dil bilgisi kurallarını öğren',
                     icon: Icons.school_rounded,
-                    gradient: const [Color(0xFF6A1B9A), Color(0xFFAB47BC)],
+                    gradient: const [Color(0xFF4facfe), Color(0xFF00f2fe)],
                     onTap: () => Navigator.pushNamed(context, '/grammar'),
                   ),
                 ]),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  mainAxisSpacing: 16,
-                  crossAxisSpacing: 16,
-                  childAspectRatio: 1.1,
-                ),
               ),
             ),
 
@@ -322,30 +163,34 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: GestureDetector(
                   onTap: () => Navigator.pushNamed(context, '/chatbot'),
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFFa8edea), Color(0xFFfed6e3)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
                       borderRadius: BorderRadius.circular(24),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.shade200,
-                          blurRadius: 12,
-                          offset: const Offset(0, 6),
-                          spreadRadius: 1,
+                          color: const Color(0xFFa8edea).withOpacity(0.3),
+                          blurRadius: 15,
+                          offset: const Offset(0, 8),
+                          spreadRadius: 0,
                         ),
                       ],
                     ),
                     child: Row(
                       children: [
                         Container(
-                          padding: const EdgeInsets.all(14),
+                          padding: const EdgeInsets.all(16),
                           decoration: BoxDecoration(
-                            color: primaryColor.withOpacity(0.1),
+                            color: Colors.white.withOpacity(0.9),
                             borderRadius: BorderRadius.circular(16),
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.psychology_alt_rounded,
-                            color: primaryColor,
+                            color: Color(0xFF6A1B9A),
                             size: 28,
                           ),
                         ),
@@ -357,25 +202,34 @@ class _HomeScreenState extends State<HomeScreen> {
                               const Text(
                                 'AI Asistan',
                                 style: TextStyle(
-                                  fontSize: 18,
+                                  fontSize: 20,
                                   fontWeight: FontWeight.bold,
+                                  color: Color(0xFF2D3748),
                                 ),
                               ),
                               const SizedBox(height: 6),
                               Text(
                                 'Sorularını yanıtlamak için hazır',
                                 style: TextStyle(
-                                  color: textSecondaryColor,
+                                  color: const Color(0xFF2D3748).withOpacity(0.7),
                                   fontSize: 14,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                             ],
                           ),
                         ),
-                        Icon(
-                          Icons.arrow_forward_ios_rounded,
-                          color: textSecondaryColor.withOpacity(0.7),
-                          size: 16,
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.8),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            color: const Color(0xFF6A1B9A).withOpacity(0.8),
+                            size: 16,
+                          ),
                         ),
                       ],
                     ),
@@ -449,6 +303,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Widget _buildEnhancedFeatureCard({
     required String title,
+    required String subtitle,
     required IconData icon,
     required List<Color> gradient,
     required VoidCallback onTap,
@@ -456,7 +311,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: gradient,
@@ -466,35 +321,66 @@ class _HomeScreenState extends State<HomeScreen> {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-              color: gradient.first.withOpacity(0.2),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-              spreadRadius: -2,
+              color: gradient.first.withOpacity(0.3),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+              spreadRadius: 0,
             ),
           ],
         ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(10),
+              padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
                 color: Colors.white.withOpacity(0.2),
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                  color: Colors.white.withOpacity(0.3),
+                  width: 1,
+                ),
               ),
               child: Icon(
                 icon,
                 color: Colors.white,
-                size: 22,
+                size: 26,
               ),
             ),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
+            const SizedBox(width: 20),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.white.withOpacity(0.8),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.2),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: Colors.white.withOpacity(0.8),
+                size: 16,
               ),
             ),
           ],
